@@ -12,7 +12,7 @@ use std::{
 pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
     let (tx, rx) = mpsc::channel();
 
-    (Sender {inner: tx}, Receiver: {inner: rx})
+    (Sender { inner: tx }, Receiver { inner: rx })
 }
 
 /// Create a pair of the [`SyncSender`] and the [`Receiver`].
@@ -22,7 +22,7 @@ pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
 pub fn sync_channel<T>(bound: usize) -> (SyncSender<T>, Receiver<T>) {
     let (tx, rx) = mpsc::sync_channel(bound);
 
-    (SyncSender {inner: tx}, Receiver: {inner: rx})
+    (SyncSender { inner: tx }, Receiver { inner: rx })
 }
 
 pub struct Receiver<T> {
