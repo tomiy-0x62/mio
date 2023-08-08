@@ -1,5 +1,7 @@
 use crate::io_source::IoSource;
 use crate::{event, sys, Interest, Registry, Token};
+#[cfg(unix)]
+use std::os::unix::io::AsRawFd;
 use std::{
     io,
     sync::{mpsc, Arc, Mutex},
@@ -12,7 +14,14 @@ use std::{
 pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
     let (tx, rx) = mpsc::channel();
 
-    (Sender { inner: tx }, Receiver { inner: rx })
+    (
+        Sender {
+            inner: IoSource::new(tx),
+        },
+        Receiver {
+            inner: IoSource::new(rx),
+        },
+    )
 }
 
 /// Create a pair of the [`SyncSender`] and the [`Receiver`].
@@ -22,7 +31,14 @@ pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
 pub fn sync_channel<T>(bound: usize) -> (SyncSender<T>, Receiver<T>) {
     let (tx, rx) = mpsc::sync_channel(bound);
 
-    (SyncSender { inner: tx }, Receiver { inner: rx })
+    (
+        SyncSender {
+            inner: IoSource::new(tx),
+        },
+        Receiver {
+            inner: IoSource::new(rx),
+        },
+    )
 }
 
 pub struct Receiver<T> {
@@ -60,6 +76,13 @@ impl<T> event::Source for Receiver<T> {
     }
 }
 
+#[cfg(unix)]
+impl<T> AsRawFd for Receiver<T> {
+    fn as_raw_fd(&self) -> RawFd {
+        self.inner.as_raw_fd()
+    }
+}
+
 pub struct Sender<T> {
     inner: IoSource<mpsc::Sender<T>>,
 }
@@ -71,7 +94,7 @@ impl<T> Sender<T> {
     /// Note that it does not return any I/O error even if it occurs
     /// when waking up the [`mio::poll::Poll`].
     pub fn send(&self, t: T) -> Result<(), mpsc::SendError<T>> {
-        self.inner.do_io(|inner| inner.send())
+        self.inner.do_io(|inner| Ok(inner.send(t)))
     }
 }
 
@@ -86,7 +109,7 @@ impl<T> SyncSender<T> {
     /// Note that it does not return any I/O error even if it occurs
     /// when waking up the [`mio::poll::Poll`].
     pub fn send(&self, t: T) -> Result<(), mpsc::SendError<T>> {
-        self.inner.do_io(|inner| inner.send())
+        self.inner.do_io(|inner| Ok(inner.send(t)))
     }
 
     /// Try to send a value. It works just like [`mpsc::SyncSender::send`].
@@ -95,6 +118,6 @@ impl<T> SyncSender<T> {
     /// Note that it does not return any I/O error even if it occurs
     /// when waking up the [`mio::poll::Poll`].
     pub fn try_send(&self, t: T) -> Result<(), mpsc::SendError<T>> {
-        self.inner.do_io(|inner| inner.try_send())
+        self.inner.do_io(|inner| Ok(inner.try_send(t)))
     }
 }
