@@ -36,7 +36,7 @@ impl<T> Receiver<T> {
     }
 }
 
-impl event::Source for Receiver {
+impl event::Source for Receiver<T> {
     fn register(
         &mut self,
         registry: &Registry,
