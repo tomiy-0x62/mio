@@ -41,6 +41,8 @@ os-ext = [
 ]
 # Enables `mio::net` module containing networking primitives.
 net = []
+# Enables `mio::mpsc` module containing std::mssc.
+mpsc = []
 
 [dependencies]
 log = { version = "0.4.8", optional = true }
@@ -84,7 +86,7 @@ targets = [
 ]
 
 [package.metadata.playground]
-features = ["os-poll", "os-ext", "net"]
+features = ["os-poll", "os-ext", "net", "mpsc"]
 
 [[example]]
 name = "tcp_server"

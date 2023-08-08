@@ -46,6 +46,17 @@ macro_rules! cfg_net {
     }
 }
 
+/// The `mpsc` feature is enabled.
+macro_rules! cfg_mpsc {
+    ($($item:item)*) => {
+        $(
+            #[cfg(feature = "mpsc")]
+            #[cfg_attr(docsrs, doc(cfg(feature = "mpsc")))]
+            $item
+        )*
+    }
+}
+
 /// One of the features enabled that needs `IoSource`. That is `net` or `os-ext`
 /// on Unix (for `pipe`).
 macro_rules! cfg_io_source {

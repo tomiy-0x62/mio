@@ -61,6 +61,10 @@ cfg_net! {
     pub mod net;
 }
 
+cfg_mpsc! {
+    pub mod mpsc;
+}
+
 #[doc(no_inline)]
 pub use event::Events;
 pub use interest::Interest;
@@ -117,6 +121,10 @@ pub mod features {
     #![cfg_attr(not(feature = "net"), doc = "## Network types (disabled)")]
     //!
     //! The `net` feature enables networking primitives in the `net` module.
+    #![cfg_attr(feature = "mpsc", doc = "## Network types (enabled)")]
+    #![cfg_attr(not(feature = "mpsc"), doc = "## Network types (disabled)")]
+    //!
+    //! The `mpsc` feature enables mpsc channel in the `mpsc` module.
 }
 
 pub mod guide {
