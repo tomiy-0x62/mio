@@ -36,7 +36,7 @@ impl<T> Receiver<T> {
     }
 }
 
-impl event::Source for Receiver<T> {
+impl<T> event::Source for Receiver<T> {
     fn register(
         &mut self,
         registry: &Registry,
@@ -64,7 +64,7 @@ pub struct Sender<T> {
     inner: IoSource<mpsc::Sender<T>>,
 }
 
-impl<T> SyncSender<T> {
+impl<T> Sender<T> {
     /// Try to send a value. It works just like [`mpsc::SyncSender::send`].
     /// After sending it, it's waking upthe [`mio::poll::Poll`].
     ///
